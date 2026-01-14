@@ -6,20 +6,22 @@ How to Run:
 2. Run: python app.py
 3. Open browser: http://localhost:5000
 """
+from flask import Flask
 
-from flask import Flask  # Import Flask class from the flask package
+app = Flask(__name__)
 
-app = Flask(__name__)  # Create Flask app instance, __name__ tells Flask where to look for templates/static files
-
-
-@app.route('/')  # Decorator that maps URL '/' (home page) to this function
+# Home route
+@app.route('/')
 def home():
-    return "Hello Flask! Welcome to my first web server!"  # This text displays in the browser
+    return "<h1>Hello Mayuri!</h1><p>Welcome to my first Flask web server.</p>"
 
+# About route
+@app.route('/about')
+def about():
+    return "This is the about page"
 
 if __name__ == '__main__':
-    app.run(debug=True)  # debug=True enables auto-reload and detailed error messages
-
+    app.run(debug=True)
 
 # =============================================================================
 # EXERCISES - Try these after running the basic app:

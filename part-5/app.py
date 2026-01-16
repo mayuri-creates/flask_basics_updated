@@ -1,164 +1,109 @@
 """
-Part 4: Dynamic Routes - URL Parameters
-========================================
+Part 5: Mini Project - Personal Website with Flask
+===================================================
+A complete personal website using Flask with all pages working.
+
 How to Run:
 1. Make sure venv is activated
 2. Run: python app.py
-3. Try different URLs like /user/YourName or /post/123
+3. Open browser: http://localhost:5000
 """
 
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, abort, request
 
+# =========================
+# Initialize Flask App
+# =========================
 app = Flask(__name__)
 
-# ---------------------------
-# Existing routes
-# ---------------------------
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/user/<username>')
-def user_profile(username):
-    return render_template('user.html', username=username)
-
-
-@app.route('/post/<int:post_id>')
-def show_post(post_id):
-    posts = {
-        1: {'title': 'Getting Started with Flask', 'content': 'Flask is a micro-framework...'},
-        2: {'title': 'Understanding Routes', 'content': 'Routes map URLs to functions...'},
-        3: {'title': 'Working with Templates', 'content': 'Jinja2 makes HTML dynamic...'},
-    }
-    post = posts.get(post_id)
-    return render_template('post.html', post_id=post_id, post=post)
-
-
-@app.route('/user/<username>/post/<int:post_id>')
-def user_post(username, post_id):
-    return render_template('user_post.html', username=username, post_id=post_id)
-
-
-@app.route('/about/')
-def about():
-    return render_template('about.html')
-
-
-@app.route('/links')
-def show_links():
-    links = {
-        'home': url_for('home'),
-        'about': url_for('about'),
-        'user_alice': url_for('user_profile', username='Alice'),
-        'user_bob': url_for('user_profile', username='Bob'),
-        'post_1': url_for('show_post', post_id=1),
-        'post_2': url_for('show_post', post_id=2),
-    }
-    return render_template('links.html', links=links)
-
-
-# ---------------------------
-# Exercise 4.1: Product page
-# ---------------------------
-
-products = {
-    1: {'name': 'Laptop', 'price': 55000},
-    2: {'name': 'Smartphone', 'price': 20000},
-    3: {'name': 'Headphones', 'price': 1500},
+# =========================
+# Personal Info & Data
+# =========================
+PERSONAL_INFO = {
+    'name': 'Mayuri',
+    'title': 'Python & Flask Developer',
+    'bio': 'I am an MCA graduate learning backend development using Flask and Python.',
+    'email': 'mayurimahajan252@gmail.com',
+    'github': 'https://github.com/mayuri-creates',
+    'linkedin': 'https://www.linkedin.com/in/mayuri-mahajan-a44378244/',
 }
 
+SKILLS = [
+    {'name': 'Python', 'level': 85},
+    {'name': 'Flask', 'level': 70},
+    {'name': 'HTML/CSS', 'level': 80},
+    {'name': 'JavaScript', 'level': 55},
+    {'name': 'SQL', 'level': 65},
+]
 
-@app.route('/product/<int:product_id>')
-def show_product(product_id):
-    product = products.get(product_id)
-    return render_template('product.html', product_id=product_id, product=product)
+PROJECTS = [
+    {'id': 1, 'name': 'Personal Website', 'description': 'My portfolio built using Flask.', 'tech': ['Python', 'Flask', 'HTML', 'CSS'], 'status': 'Completed'},
+    {'id': 2, 'name': 'Student Management System', 'description': 'CRUD app using Flask and SQLite.', 'tech': ['Python', 'Flask', 'SQLite'], 'status': 'In Progress'},
+    {'id': 3, 'name': 'Blog Platform', 'description': 'Simple blog with authentication.', 'tech': ['Flask', 'SQL', 'HTML'], 'status': 'In Progress'},
+]
+
+BLOG_POSTS = [
+    {'id': 1, 'title': 'Learning Flask', 'content': 'Flask is a lightweight Python web framework...', 'date': '2025-01-05'},
+    {'id': 2, 'title': 'Why I Love Python', 'content': 'Python is simple, powerful, and versatile...', 'date': '2025-01-10'},
+    {'id': 3, 'title': 'My First Web App', 'content': 'Building my first Flask app was exciting...', 'date': '2025-01-15'},
+]
+
+# =========================
+# ROUTES
+# =========================
+
+@app.route('/')
+def home():
+    return render_template('index.html', info=PERSONAL_INFO, page_title=f"Home | {PERSONAL_INFO['name']}")
+
+@app.route('/about')
+def about():
+    return render_template('about.html', info=PERSONAL_INFO, skills=SKILLS, page_title=f"About | {PERSONAL_INFO['name']}")
+
+@app.route('/projects')
+def projects():
+    return render_template('projects.html', info=PERSONAL_INFO, projects=PROJECTS, page_title=f"Projects | {PERSONAL_INFO['name']}")
 
 
-# ---------------------------
-# Exercise 4.2: Category and product
-# ---------------------------
-products = {
-        1: {'name': 'Laptop', 'price': 55000},
-        2: {'name': 'Smartphone', 'price': 20000},
-        3: {'name': 'Headphones', 'price': 1500},
-    }
 
+@app.route('/project/<int:project_id>')
+def project_detail(project_id):
+    project = next((p for p in PROJECTS if p['id'] == project_id), None)
 
-
-@app.route('/category/<category_name>/product/<int:product_id>')
-def category_product(category_name, product_id):
-    product = products.get(product_id)
-    return render_template('category_product.html', category=category_name, product_id=product_id, product=product)
-
-
-# ---------------------------
-# Exercise 4.3: Search route
-# ---------------------------
-@app.route('/search/<query>')
-def search(query):
-    # Case-insensitive search
-    results = {
-        pid: info
-        for pid, info in products.items()
-        if query.lower() in info['name'].lower()
-    }
+    if project is None:
+        abort(404)
 
     return render_template(
-        'search.html',
-        query=query,
-        results=results
+        'project_detail.html',
+        project=project,
+        project_id=project_id,
+        info=PERSONAL_INFO,
+        page_title=f"{project['name']} | {PERSONAL_INFO['name']}"
     )
 
 
-# ---------------------------
-# New route: Handle search form submission
-# ---------------------------
-@app.route('/search', methods=['POST'])
-def search_form():
-    query = request.form.get('query')
 
-    if query:
-        return redirect(url_for('search', query=query))
+@app.route('/blog')
+def blog():
+    return render_template('blog.html', info=PERSONAL_INFO, posts=BLOG_POSTS, page_title=f"Blog | {PERSONAL_INFO['name']}")
 
-    return redirect(url_for('home'))
+@app.route('/skill/<skill_name>')
+def skill_projects(skill_name):
+    matched_projects = [
+        project for project in PROJECTS
+        if skill_name.lower() in [tech.lower() for tech in project['tech']]
+    ]
+    message = None
+    if not matched_projects:
+        message = f"No projects found using {skill_name.title()}."
+    return render_template('skill.html', info=PERSONAL_INFO, skill=skill_name.title(), projects=matched_projects, message=message, page_title=f"{skill_name.title()} Projects | {PERSONAL_INFO['name']}")
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html', info=PERSONAL_INFO, page_title=f"Contact | {PERSONAL_INFO['name']}")
 
-
-
-
-
+# =========================
+# Run the App
+# =========================
 if __name__ == '__main__':
     app.run(debug=True)
-
-# =============================================================================
-# URL PARAMETER TYPES:
-# =============================================================================
-#
-# <variable>         - String (default), accepts any text without slashes
-# <int:variable>     - Integer, accepts only positive integers
-# <float:variable>   - Float, accepts floating point numbers
-# <path:variable>    - String, but also accepts slashes
-# <uuid:variable>    - UUID strings
-#
-# =============================================================================
-
-# =============================================================================
-# EXERCISES:
-# =============================================================================
-#
-# Exercise 4.1: Create a product page
-#   - Add route /product/<int:product_id>
-#   - Create a products dictionary with id, name, price
-#   - Display product details or "Not Found" message
-#
-# Exercise 4.2: Category and product route
-#   - Add route /category/<category_name>/product/<int:product_id>
-#   - Display both the category and product information
-#
-# Exercise 4.3: Search route
-#   - Add route /search/<query>
-#   - Display "Search results for: [query]"
-#   - Bonus: Add a simple search form that redirects to this route
-#
-# =============================================================================

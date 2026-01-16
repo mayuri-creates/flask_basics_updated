@@ -1,0 +1,11 @@
+
+
+
+<h1>Category: {{ category }}</h1>
+{% if product %}
+  <p>Product ID: {{ product_id }}</p>
+  <p>Name: {{ product.name }}</p>
+  <p>Price: ₹{{ product.price }}</p>
+{% else %}
+  <p>Product Not Found!</p>
+{% endif %}

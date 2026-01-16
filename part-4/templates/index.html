@@ -75,6 +75,27 @@
             padding: 15px;
             margin: 15px 0;
         }
+        .search-form {
+            margin: 20px 0;
+        }
+        .search-form input[type="text"] {
+            padding: 8px;
+            width: 60%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .search-form button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #48bb78;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background-color: #38a169;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +108,14 @@
 
         <h1>Dynamic Routes in Flask</h1>
         <p>Learn how to capture values from URLs using <code>&lt;variable&gt;</code> syntax!</p>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <form action="{{ url_for('search_form') }}" method="POST">
+                <input type="text" name="query" placeholder="Search products..." required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
 
         <!-- User Profile Demo -->
         <div class="route-demo">

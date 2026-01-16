@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>All Tasks</h2>
+
+<table class="task-table">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for task in tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+
+            <td>
+                {{ task.priority }}
+            </td>
+
+            <td class="
+                {% if task.status == 'Completed' %}completed
+                {% elif task.status == 'Pending' %}pending
+                {% else %}in-progress
+                {% endif %}
+            ">
+                {{ task.status }}
+            </td>
+
+            <td>
+                <a href="{{ url_for('task_detail', id=task.id) }}">View</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

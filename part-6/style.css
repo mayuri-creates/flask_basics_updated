@@ -1,0 +1,113 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Body */
+body {
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* Header */
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin-bottom: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main content */
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Task Table */
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.task-table th {
+    background-color: #2c3e50;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.task-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.task-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status Colors */
+.completed {
+    color: green;
+    font-weight: bold;
+}
+
+.pending {
+    color: orange;
+    font-weight: bold;
+}
+
+.in-progress {
+    color: blue;
+    font-weight: bold;
+}
+
+/* Buttons */
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Form inputs */
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 15px;
+    background: #ddd;
+    margin-top: 40px;
+}

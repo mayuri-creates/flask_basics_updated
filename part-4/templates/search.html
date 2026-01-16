@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 40px auto; padding: 20px; background: #f0f4f8; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        a { color: #3182ce; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search Results</h1>
+        <p>Search results for: "<strong>{{ query }}</strong>"</p>
+
+        {% if results %}
+            <ul>
+            {% for pid, product in results.items() %}
+                <li>
+                    <a href="{{ url_for('show_product', product_id=pid) }}">{{ product.name }}</a> - ₹{{ product.price }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No products found matching your search.</p>
+        {% endif %}
+
+        <p><a href="{{ url_for('home') }}">Back to Home</a></p>
+    </div>
+</body>
+</html>

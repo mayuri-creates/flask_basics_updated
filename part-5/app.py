@@ -1,99 +1,145 @@
 """
-Part 5: Mini Project - Personal Website with Flask
-===================================================
-A complete personal website using everything learned in Parts 1-4.
-
+Part 4: Dynamic Routes - URL Parameters
+========================================
 How to Run:
 1. Make sure venv is activated
 2. Run: python app.py
-3. Open browser: http://localhost:5000
+3. Try different URLs like /user/YourName or /post/123
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, request, redirect
 
 app = Flask(__name__)
 
-# =============================================================================
-# YOUR DATA - Customize this section with your own information!
-# =============================================================================
-
-PERSONAL_INFO = {
-    'name': 'Your Name',
-    'title': 'Web Developer',
-    'bio': 'A passionate developer learning Flask and web development.',
-    'email': 'your.email@example.com',
-    'github': 'https://github.com/yourusername',
-    'linkedin': 'https://linkedin.com/in/yourusername',
-}
-
-SKILLS = [
-    {'name': 'Python', 'level': 80},
-    {'name': 'HTML/CSS', 'level': 75},
-    {'name': 'Flask', 'level': 60},
-    {'name': 'JavaScript', 'level': 50},
-    {'name': 'SQL', 'level': 45},
-]
-
-PROJECTS = [
-    {'id': 1, 'name': 'Personal Website', 'description': 'A Flask-powered personal portfolio website.', 'tech': ['Python', 'Flask', 'HTML', 'CSS'], 'status': 'Completed'},
-    {'id': 2, 'name': 'Todo App', 'description': 'A simple task management application.', 'tech': ['Python', 'Flask', 'SQLite'], 'status': 'In Progress'},
-    {'id': 3, 'name': 'Weather Dashboard', 'description': 'Display weather data from an API.', 'tech': ['Python', 'Flask', 'API'], 'status': 'Planned'},
-]
-
-
-# =============================================================================
-# ROUTES
-# =============================================================================
-
+# ---------------------------
+# Existing routes
+# ---------------------------
 @app.route('/')
 def home():
-    return render_template('index.html', info=PERSONAL_INFO)
+    return render_template('index.html')
 
 
-@app.route('/about')
+@app.route('/user/<username>')
+def user_profile(username):
+    return render_template('user.html', username=username)
+
+
+@app.route('/post/<int:post_id>')
+def show_post(post_id):
+    posts = {
+        1: {'title': 'Getting Started with Flask', 'content': 'Flask is a micro-framework...'},
+        2: {'title': 'Understanding Routes', 'content': 'Routes map URLs to functions...'},
+        3: {'title': 'Working with Templates', 'content': 'Jinja2 makes HTML dynamic...'},
+    }
+    post = posts.get(post_id)
+    return render_template('post.html', post_id=post_id, post=post)
+
+
+@app.route('/user/<username>/post/<int:post_id>')
+def user_post(username, post_id):
+    return render_template('user_post.html', username=username, post_id=post_id)
+
+
+@app.route('/about/')
 def about():
-    return render_template('about.html', info=PERSONAL_INFO, skills=SKILLS)
+    return render_template('about.html')
 
 
-@app.route('/projects')
-def projects():
-    return render_template('projects.html', info=PERSONAL_INFO, projects=PROJECTS)
+@app.route('/links')
+def show_links():
+    links = {
+        'home': url_for('home'),
+        'about': url_for('about'),
+        'user_alice': url_for('user_profile', username='Alice'),
+        'user_bob': url_for('user_profile', username='Bob'),
+        'post_1': url_for('show_post', post_id=1),
+        'post_2': url_for('show_post', post_id=2),
+    }
+    return render_template('links.html', links=links)
 
 
-@app.route('/project/<int:project_id>')  # Dynamic route for individual project
-def project_detail(project_id):
-    project = None
-    for p in PROJECTS:
-        if p['id'] == project_id:
-            project = p
-            break
-    return render_template('project_detail.html', info=PERSONAL_INFO, project=project, project_id=project_id)
+# ---------------------------
+# Exercise 4.1: Product page
+# ---------------------------
+
+products = {
+    1: {'name': 'Laptop', 'price': 55000},
+    2: {'name': 'Smartphone', 'price': 20000},
+    3: {'name': 'Headphones', 'price': 1500},
+}
 
 
-@app.route('/contact')
-def contact():
-    return render_template('contact.html', info=PERSONAL_INFO)
+@app.route('/product/<int:product_id>')
+def show_product(product_id):
+    product = products.get(product_id)
+    return render_template('product.html', product_id=product_id, product=product)
+
+
+# ---------------------------
+# Exercise 4.2: Category and product
+# ---------------------------
+products = {
+        1: {'name': 'Laptop', 'price': 55000},
+        2: {'name': 'Smartphone', 'price': 20000},
+        3: {'name': 'Headphones', 'price': 1500},
+    }
+
+
+
+@app.route('/category/<category_name>/product/<int:product_id>')
+def category_product(category_name, product_id):
+    product = products.get(product_id)
+    return render_template('category_product.html', category=category_name, product_id=product_id, product=product)
+
+
+# ---------------------------
+# Exercise 4.3: Search route
+# ---------------------------
+@app.route('/search/<query>')
+def search(query):
+    # Case-insensitive search
+    results = {
+        pid: info
+        for pid, info in products.items()
+        if query.lower() in info['name'].lower()
+    }
+
+    return render_template(
+        'search.html',
+        query=query,
+        results=results
+    )
+
+
+# ---------------------------
+# New route: Handle search form submission
+# ---------------------------
+@app.route('/search', methods=['POST'])
+def search_form():
+    query = request.form.get('query')
+
+    if query:
+        return redirect(url_for('search', query=query))
+
+    return redirect(url_for('home'))
+
+
+
+
 
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-
 # =============================================================================
-# PROJECT STRUCTURE:
+# URL PARAMETER TYPES:
 # =============================================================================
 #
-# part-5/
-# ├── app.py              <- You are here
-# ├── static/
-# │   └── style.css       <- CSS styles
-# └── templates/
-#     ├── base.html       <- Base template (inherited by all pages)
-#     ├── index.html      <- Home page
-#     ├── about.html      <- About page
-#     ├── projects.html   <- Projects list
-#     ├── project_detail.html <- Single project view
-#     └── contact.html    <- Contact page
+# <variable>         - String (default), accepts any text without slashes
+# <int:variable>     - Integer, accepts only positive integers
+# <float:variable>   - Float, accepts floating point numbers
+# <path:variable>    - String, but also accepts slashes
+# <uuid:variable>    - UUID strings
 #
 # =============================================================================
 
@@ -101,22 +147,18 @@ if __name__ == '__main__':
 # EXERCISES:
 # =============================================================================
 #
-# Exercise 5.1: Personalize your website
-#   - Update PERSONAL_INFO with your real information
-#   - Add your actual skills and projects
+# Exercise 4.1: Create a product page
+#   - Add route /product/<int:product_id>
+#   - Create a products dictionary with id, name, price
+#   - Display product details or "Not Found" message
 #
-# Exercise 5.2: Add a new page
-#   - Create a /blog route
-#   - Add blog posts data structure
-#   - Create blog.html template
+# Exercise 4.2: Category and product route
+#   - Add route /category/<category_name>/product/<int:product_id>
+#   - Display both the category and product information
 #
-# Exercise 5.3: Enhance the styling
-#   - Modify static/style.css
-#   - Add your own color scheme
-#   - Make it responsive for mobile
-#
-# Exercise 5.4: Add more dynamic features
-#   - Create a /skill/<skill_name> route
-#   - Show projects that use that skill
+# Exercise 4.3: Search route
+#   - Add route /search/<query>
+#   - Display "Search results for: [query]"
+#   - Bonus: Add a simple search form that redirects to this route
 #
 # =============================================================================

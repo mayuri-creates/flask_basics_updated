@@ -7,43 +7,45 @@ How to Run:
 3. Try different URLs like /user/YourName or /post/123
 """
 
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 
 app = Flask(__name__)
 
-
+# ---------------------------
+# Existing routes
+# ---------------------------
 @app.route('/')
 def home():
     return render_template('index.html')
 
 
-@app.route('/user/<username>')  # <username> captures any text from URL, visit: /user/Alice, /user/Bob
+@app.route('/user/<username>')
 def user_profile(username):
     return render_template('user.html', username=username)
 
 
-@app.route('/post/<int:post_id>')  # <int:post_id> captures only integers, /post/abc returns 404
+@app.route('/post/<int:post_id>')
 def show_post(post_id):
-    posts = {  # Simulated post data (in real apps, this comes from a database)
+    posts = {
         1: {'title': 'Getting Started with Flask', 'content': 'Flask is a micro-framework...'},
         2: {'title': 'Understanding Routes', 'content': 'Routes map URLs to functions...'},
         3: {'title': 'Working with Templates', 'content': 'Jinja2 makes HTML dynamic...'},
     }
-    post = posts.get(post_id)  # Get the post or None if not found
+    post = posts.get(post_id)
     return render_template('post.html', post_id=post_id, post=post)
 
 
-@app.route('/user/<username>/post/<int:post_id>')  # Multiple dynamic segments, visit: /user/Alice/post/1
+@app.route('/user/<username>/post/<int:post_id>')
 def user_post(username, post_id):
     return render_template('user_post.html', username=username, post_id=post_id)
 
 
-@app.route('/about/')  # Trailing slash means both /about and /about/ work
+@app.route('/about/')
 def about():
     return render_template('about.html')
 
 
-@app.route('/links')  # Demonstrates url_for() - generates URLs dynamically (better than hardcoding!)
+@app.route('/links')
 def show_links():
     links = {
         'home': url_for('home'),
@@ -56,9 +58,78 @@ def show_links():
     return render_template('links.html', links=links)
 
 
+# ---------------------------
+# Exercise 4.1: Product page
+# ---------------------------
+
+products = {
+    1: {'name': 'Laptop', 'price': 55000},
+    2: {'name': 'Smartphone', 'price': 20000},
+    3: {'name': 'Headphones', 'price': 1500},
+}
+
+
+@app.route('/product/<int:product_id>')
+def show_product(product_id):
+    product = products.get(product_id)
+    return render_template('product.html', product_id=product_id, product=product)
+
+
+# ---------------------------
+# Exercise 4.2: Category and product
+# ---------------------------
+products = {
+        1: {'name': 'Laptop', 'price': 55000},
+        2: {'name': 'Smartphone', 'price': 20000},
+        3: {'name': 'Headphones', 'price': 1500},
+    }
+
+
+
+@app.route('/category/<category_name>/product/<int:product_id>')
+def category_product(category_name, product_id):
+    product = products.get(product_id)
+    return render_template('category_product.html', category=category_name, product_id=product_id, product=product)
+
+
+# ---------------------------
+# Exercise 4.3: Search route
+# ---------------------------
+@app.route('/search/<query>')
+def search(query):
+    # Case-insensitive search
+    results = {
+        pid: info
+        for pid, info in products.items()
+        if query.lower() in info['name'].lower()
+    }
+
+    return render_template(
+        'search.html',
+        query=query,
+        results=results
+    )
+
+
+# ---------------------------
+# New route: Handle search form submission
+# ---------------------------
+@app.route('/search', methods=['POST'])
+def search_form():
+    query = request.form.get('query')
+
+    if query:
+        return redirect(url_for('search', query=query))
+
+    return redirect(url_for('home'))
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-
 
 # =============================================================================
 # URL PARAMETER TYPES:
